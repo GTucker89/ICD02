@@ -1,9 +1,13 @@
 #Gathers names and game data
 name = input("Enter your name: ")
-
-m1 = int(input("Enter your first score: "))
-o1 = int(input("Enter your Opponent's first score: "))
-oname = input("Enter your first Opponent's name: ")
+def o_score():
+    o1 = int(input("Enter your Opponent's first score: "))
+    oname = input("Enter your first Opponent's name: ")
+    return o1, oname
+def my_score():
+    m1 = int(input("Enter your first score: "))
+    o1, name = o_score()
+    return m1,o1,name
 
 m2 = int(input("Enter your second score: "))
 o2 = int(input("Enter your Opponent's second score: "))
