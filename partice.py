@@ -1,24 +1,61 @@
-'''
-print("*\n**\n***\n****")
-message = ("Python programming")
-length = len(message)
-print(f"{message}\n{length}")
-print(f"My name is grayson and I am {15*2} years old.")
-import math
-print(f"The value of pi is {math.pi:5f}\n{'Hello everybody!':>20}")
-num1 = 25
-num2 = 7
-print(f"{num1/num2:.3f}")
-sqr = int(input("Enter the nubmer: "))
-sqr = round(math.sqrt(sqr),2)
-print(sqr)
-fl1 = float(input("Enter float: "))
-int3 = int(fl1)
-print(f"{fl1} {int3}")
-floating1 = float(input("Enter float: "))
-int3 = int(round(floating1,0))
-print(f"{floating1} {int3}")
-in4 = int(3)
-flo = float(in4)
-print(f"{in4} {flo}")
-'''
+import pygame as pg
+from math import radians, sin, cos
+
+# Initialize Pygame
+pg.init()
+
+# Constants
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+FOV = 60  # Field of View in degrees
+
+# Colors
+WHITE = (255, 255, 255)
+
+# Initialize the screen
+screen = pg.display.set_mode((WIDTH, HEIGHT))
+pg.display.set_caption('Simple FPS')
+
+# Player variables
+player_x, player_y = WIDTH // 2, HEIGHT // 2
+player_angle = 0
+
+# Game loop
+clock = pg.time.Clock()
+while True:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            quit()
+
+    keys = pg.key.get_pressed()
+
+    # Move the player forward and backward
+    if keys[pg.K_w]:
+        player_x += 5 * cos(radians(player_angle))
+        player_y -= 5 * sin(radians(player_angle))
+    if keys[pg.K_s]:
+        player_x -= 5 * cos(radians(player_angle))
+        player_y += 5 * sin(radians(player_angle))
+
+    # Rotate the player left and right
+    if keys[pg.K_a]:
+        player_angle = (player_angle - 5) % 360
+    if keys[pg.K_d]:
+        player_angle = (player_angle + 5) % 360
+
+    # Draw everything
+    screen.fill(WHITE)
+
+    # Draw player
+    pg.draw.circle(screen, (0, 0, 255), (int(player_x), int(player_y)), 5)
+
+    # Draw player's view (a simple cone representing the FOV)
+    pg.draw.polygon(screen, (200, 200, 200),
+                    [(player_x, player_y)] +
+                    [(player_x + 300 * cos(radians(player_angle + i)),
+                      player_y - 300 * sin(radians(player_angle + i)))
+                     for i in range(-FOV // 2, FOV // 2, 5)])
+
+    pg.display.flip()
+    clock.tick(FPS)
