@@ -67,6 +67,8 @@ Tutorial_step_8 = False
 Tutorial_step_9 = False
 tutorial_counter = 0
 player_choice = 0
+score = 0
+end_timer = 0
 def detanate_asteroids(x_new,y_new,speed,size):
     random_choice = random.randint(0,1)
     if random_choice == 0:
@@ -263,6 +265,7 @@ while running:
         difficunity_text1 = font.render(f"Press q to play on Easy Mode",True,'black')
         difficunity_text2 = font.render(f"Press w to play on Medium Mode",True,'black')
         difficunity_text3 = font.render(f"Press e to play on Hard Mode",True,'black')
+        score_text = font.render(f"Your score is: {score}!",True,'black')
         if difficunity_loop == True:
             screen.blit(difficunity_text1,(100,HEIGHT- 700))
             screen.blit(difficunity_text2,(100,HEIGHT- 600))
@@ -445,9 +448,11 @@ while running:
                             print("Here")
                             detanate_asteroids(asteroids[a][2],asteroids[a][3],2,20)
                             asteroids.remove(asteroids[a])
+                            score += 100
                         else:
                             asteroids.remove(asteroids[a])
                             pygame.mixer.Sound.play(asteroid_explode)
+                        score += 100
              except:
                 pass
                 
@@ -459,12 +464,15 @@ while running:
                     invicible = True
                     invicible_timer = 3000
                     if lifes == 0:
-                        pygame.quit()
-                        sys.exit()
+                        choice = 3
                 else:
                     invicible_timer -= 1
                     if invicible_timer <= 0:
                         invicible = False
+            score += 1
+
+
+#||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     elif choice == 2:
         Tutorial_step_1_text = font.render("Press A and D to rotate the Spaceship",True,'black')
         Tutorial_step_2_text = font.render("Press W and S to Move the the Spaceship Foward and Backward",True,'black')
@@ -727,6 +735,12 @@ while running:
             if tutorial_counter >= 300:
                 tutorial_counter = 0
                 Tutorial_step_9 = False
+    if choice == 3:
+        screen.blit(score_text,(WIDTH//2 - 150,HEIGHT//2 - 50))
+        end_timer += 1
+        if end_timer >= 600:
+            pygame.quit()
+            sys.exit()
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
