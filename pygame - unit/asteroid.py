@@ -122,19 +122,15 @@ def move_asteroids():
         asteroids[aaa][2] += asteroids[aaa][4]
         asteroids[aaa][3] += asteroids[aaa][5]
         asteroids[aaa][0] = {'rect': pygame.Rect(asteroids[aaa][2], asteroids[aaa][3], asteroids[aaa][8], asteroids[aaa][8]), 'color': 'black', 'radius': asteroids[aaa][8]}
-        if asteroids[a][7] == "w":
-            if asteroids[aaa][6] == asteroids[aaa][2]:
-                asteroids.remove(asteroids[aaa])
-        else:
-            if asteroids[aaa][6] == asteroids[aaa][3]:
-                asteroids.remove(asteroids[aaa])
+        if asteroids[aaa][2] >= 850 or asteroids[aaa][2] <= -50 or asteroids[aaa][3] >= 850 or asteroids[aaa][3] <= -50:
+            asteroids.remove(asteroids[aaa])
 def move_bullets():
     for b in range(len(bullets)-1,-1,-1):
         try:
             bullets[b][0] = pygame.Rect(bullets[b][2],bullets[b][3],10,10)
             bullets[b][2] += bullets[b][4]
             bullets[b][3] += bullets[b][5]
-            if bullets[b][2] == 800 or bullets[b][2] == 0 or bullets[b][3] == 800 or bullets[b][3] == 0:
+            if bullets[b][2] >= 800 or bullets[b][2] <= 0 or bullets[b][3] >= 800 or bullets[b][3] <= 0:
                 bullets.remove(bullets[b])
         except:
             pass
