@@ -294,11 +294,27 @@ while running:
         x_speed, y_speed, center = x_y_speeds(player_x,player_x, angle, 3)
         player_x += x_speed
         player_y += y_speed
+        if player_x <= 0:
+            player_x = 0
+        if player_x >= 775:
+            player_x = 775
+        if player_y >= 775:
+            player_y = 775
+        if player_y <= 0:
+            player_y = 0
         screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
     if keys[pygame.K_s]:
         x_speed, y_speed, center = x_y_speeds(player_x,player_y,angle,3)
         player_x -= x_speed
         player_y -= y_speed
+        if player_x <= 0:
+            player_x = 0
+        if player_x >= 775:
+            player_x = 775
+        if player_y >= 775:
+            player_y = 775
+        if player_y <= 0:
+            player_y = 0
         screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
     if keys[pygame.K_a]:
         angle += 3
