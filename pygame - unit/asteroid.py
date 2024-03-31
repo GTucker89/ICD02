@@ -69,6 +69,9 @@ tutorial_counter = 0
 player_choice = 0
 score = 0
 end_timer = 0
+bullet_type = None
+shooter_loop = True
+burst_counter = 0
 def detanate_asteroids(x_new,y_new,speed,size):
     random_choice = random.randint(0,1)
     if random_choice == 0:
@@ -125,7 +128,6 @@ def detanate_asteroids(x_new,y_new,speed,size):
         y_speed -= 1
         if y_speed <= 0:
             x_speed -= 1
-        print(asteroid_info)
 def find_slope(p1,p2):
     largest = 1
     p1[1] = p1[1]*-1
@@ -261,6 +263,7 @@ while running:
             choice = 2
             first_lope = False
             lifes = 999
+#MAIN GAME
     elif choice == 1:
         difficunity_text1 = font.render(f"Press q to play on Easy Mode",True,'black')
         difficunity_text2 = font.render(f"Press w to play on Medium Mode",True,'black')
@@ -285,191 +288,245 @@ while running:
                 difficunity_loop = False
 
         if difficunity_loop == False:
-            timer_1 = font.render(f"Time Before Asteroid Storm: {int(Storm_Timer)}", True, 'black')
-            timer_2 = font.render(f"Time Before the Storm Ends: {int(active_timer)}", True, 'black')
-            if Storm_Timer > 0:
-                Storm_Timer -= clock.get_time() / 1000
-                screen.blit(timer_1, (WIDTH//2 - 150, 50))
-                if Storm_Timer <= 0:
-                    if event_storm == 0:
-                        active_timer = 15
-                    if event_storm == 1:
-                        active_timer = 10
-                    if event_storm == 2:
-                        active_timer = 30
-            if active_timer > 0 and event_storm == 1:
-                c  = difficunity -15
-                active_timer -= clock.get_time() /1000
-                screen.blit(timer_2, (WIDTH//2 - 150, 50))
-                if active_timer <= 0:
-                    difficunity -= 2
-                    c = difficunity
-                    Storm_Timer = 30
-                    fire_rate_booster_count += 1
-                    bombs += 1
-                    asteroid_slow += 1
-            if active_timer > 0 and event_storm == 0:
-                active_timer -= clock.get_time() / 1000
-                screen.blit(timer_2,(WIDTH//2 - 150, 50))
-                line_counter+= 1
-                if line_counter >= 180:
-                    create_meteor_shower_line()
-                    line_counter = 0
-                if active_timer <= 0:
-                    difficunity -= 2
-                    c = difficunity
-                    Storm_Timer = 30
-                    fire_rate_booster_count += 1
-                    bombs += 1
-                    asteroid_slow += 1
-            if active_timer > 0 and event_storm == 2:
-                active_timer -= clock.get_time() / 1000
-                screen.blit(timer_2,(WIDTH//2 - 150, 50))
-                line_counter+= 1
-                if line_counter >= 30:
-                    add_asteroid(-4,-2,2,4,True)
-                    line_counter = 0
-                if active_timer <= 0:
-                    difficunity -= 2
-                    c = difficunity
-                    Storm_Timer = 30
-                    fire_rate_booster_count += 1
-                    bombs += 1
-                    asteroid_slow += 1
-            fire_rate_boosters_left = font.render(f"Fire Rate Boosters Left: {int(fire_rate_booster_count)}",True,'black')
-            bombs_left = font.render(f"Bombs Left: {int(bombs)}",True,'black')
-            slows_left = font.render(f"Asteroids Slowers Left: {int(asteroid_slow)}",True,'black')
-            lifes_lefts = font.render(f"Lifes Left: {int(lifes)}",True,'black')
-            screen.blit(slows_left,(WIDTH-300,HEIGHT-50))
-            screen.blit(lifes_lefts,(10,HEIGHT-50))
-            screen.blit(bombs_left,(WIDTH-180,10))
-            screen.blit(fire_rate_boosters_left,(10,10))
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_w]:
-                x_speed, y_speed, center = x_y_speeds(player_x,player_x, angle, 3)
-                player_x += x_speed
-                player_y += y_speed
-                if player_x <= 0:
-                    player_x = WIDTH - 25
-                if player_x >= 775:
-                    player_x = 0
-                if player_y >= 775:
-                    player_y = 0
-                if player_y <= 0:
-                    player_y = HEIGHT - 25
-                screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
-            if keys[pygame.K_s]:
-                x_speed, y_speed, center = x_y_speeds(player_x,player_y,angle,3)
-                player_x -= x_speed
-                player_y -= y_speed
-                if player_x <= 0:
-                    player_x = 0 + WIDTH
-                if player_x >= 775:
-                    player_x = 775 - WIDTH
-                if player_y >= 775:
-                    player_y = 775 - HEIGHT
-                if player_y <= 0:
-                    player_y = 0 + HEIGHT
-                screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
-            if keys[pygame.K_a]:
-                angle += 3
-                screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
-            if keys[pygame.K_d]:
-                angle += -3
-                screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
-            if keys[pygame.K_SPACE]:
-                bullet_counter += 1
-                if bullet_counter >= bc:
-                    bullet_counter = 0
-                    create_bullet(player_x,player_y,angle,5)
-                    pygame.mixer.Sound.play(shoot_sound)
+            if shooter_loop == True:
+             shooter_option_1 = font.render(f"Press 1 to select classic shooter",True,'black')
+             shooter_option_2 = font.render(f"Press 2 to select Shotgun shooter",True,'black')
+             shooter_option_3 = font.render(f"Press 3 to select Burst shooter",True,'black')
+             screen.blit(shooter_option_1,(WIDTH//2-100,HEIGHT//2 - 100))
+             screen.blit(shooter_option_2,(WIDTH//2-100,HEIGHT//2 ))
+             screen.blit(shooter_option_3,(WIDTH//2-100,HEIGHT//2 + 100))
+             keys = pygame.key.get_pressed()
+             if keys[pygame.K_1]:
+                 bullet_type = 1
+                 shooter_loop = False
+                 bc = 10
+             elif keys[pygame.K_2]:
+                 bullet_type = 2
+                 shooter_loop = False
+                 bc = 25
+             elif keys[pygame.K_3]:
+                 bullet_type = 3
+                 shooter_loop = False
+                 bc = 40
+            else:
+                timer_1 = font.render(f"Time Before Asteroid Storm: {int(Storm_Timer)}", True, 'black')
+                timer_2 = font.render(f"Time Before the Storm Ends: {int(active_timer)}", True, 'black')
+                if Storm_Timer > 0:
+                    Storm_Timer -= clock.get_time() / 1000
+                    screen.blit(timer_1, (WIDTH//2 - 150, 50))
+                    if Storm_Timer <= 0:
+                        if event_storm == 0:
+                            active_timer = 15
+                        if event_storm == 1:
+                            active_timer = 10
+                        if event_storm == 2:
+                            active_timer = 30
+                if active_timer > 0 and event_storm == 1:
+                    c  = difficunity -15
+                    active_timer -= clock.get_time() /1000
+                    screen.blit(timer_2, (WIDTH//2 - 150, 50))
+                    if active_timer <= 0:
+                        difficunity -= 2
+                        c = difficunity
+                        Storm_Timer = 30
+                        fire_rate_booster_count += 1
+                        bombs += 1
+                        asteroid_slow += 1
+                if active_timer > 0 and event_storm == 0:
+                    active_timer -= clock.get_time() / 1000
+                    screen.blit(timer_2,(WIDTH//2 - 150, 50))
+                    line_counter+= 1
+                    if line_counter >= 180:
+                        create_meteor_shower_line()
+                        line_counter = 0
+                    if active_timer <= 0:
+                        difficunity -= 2
+                        c = difficunity
+                        Storm_Timer = 30
+                        fire_rate_booster_count += 1
+                        bombs += 1
+                        asteroid_slow += 1
+                if active_timer > 0 and event_storm == 2:
+                    active_timer -= clock.get_time() / 1000
+                    screen.blit(timer_2,(WIDTH//2 - 150, 50))
+                    line_counter+= 1
+                    if line_counter >= 30:
+                        add_asteroid(-4,-2,2,4,True)
+                        line_counter = 0
+                    if active_timer <= 0:
+                        difficunity -= 2
+                        c = difficunity
+                        Storm_Timer = 30
+                        fire_rate_booster_count += 1
+                        bombs += 1
+                        asteroid_slow += 1
+                fire_rate_boosters_left = font.render(f"Fire Rate Boosters Left: {int(fire_rate_booster_count)}",True,'black')
+                bombs_left = font.render(f"Bombs Left: {int(bombs)}",True,'black')
+                slows_left = font.render(f"Asteroids Slowers Left: {int(asteroid_slow)}",True,'black')
+                lifes_lefts = font.render(f"Lifes Left: {int(lifes)}",True,'black')
+                screen.blit(slows_left,(WIDTH-300,HEIGHT-50))
+                screen.blit(lifes_lefts,(10,HEIGHT-50))
+                screen.blit(bombs_left,(WIDTH-180,10))
+                screen.blit(fire_rate_boosters_left,(10,10))
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_w]:
+                    x_speed, y_speed, center = x_y_speeds(player_x,player_x, angle, 3)
+                    player_x += x_speed
+                    player_y += y_speed
+                    if player_x <= 0:
+                        player_x = WIDTH - 25
+                    if player_x >= 775:
+                        player_x = 0
+                    if player_y >= 775:
+                        player_y = 0
+                    if player_y <= 0:
+                        player_y = HEIGHT - 25
+                    screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
+                if keys[pygame.K_s]:
+                    x_speed, y_speed, center = x_y_speeds(player_x,player_y,angle,3)
+                    player_x -= x_speed
+                    player_y -= y_speed
+                    if player_x <= 0:
+                        player_x = 0 + WIDTH
+                    if player_x >= 775:
+                        player_x = 775 - WIDTH
+                    if player_y >= 775:
+                        player_y = 775 - HEIGHT
+                    if player_y <= 0:
+                        player_y = 0 + HEIGHT
+                    screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
+                if keys[pygame.K_a]:
+                    angle += 3
+                    screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
+                if keys[pygame.K_d]:
+                    angle += -3
+                    screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
+                if keys[pygame.K_SPACE]:
+                    bullet_counter += 1
+                    if bullet_type == 1:
+                        if bullet_counter >= bc:
+                            bullet_counter = 0
+                            pygame.mixer.Sound.play(shoot_sound)
+                    if bullet_type == 2:
+                        if bullet_counter >= bc:
+                            bullet_counter = 0
+                            create_bullet(player_x,player_y,angle,5) 
+                            create_bullet(player_x,player_y,angle + 5,5) 
+                            create_bullet(player_x,player_y,angle + 10,5) 
+                            create_bullet(player_x,player_y,angle - 5,5) 
+                            create_bullet(player_x,player_y,angle - 10,5) 
+                            pygame.mixer.Sound.play(shoot_sound)
+                    if bullet_type == 3:
+                        if bullet_counter >= bc:
+                            burst_counter += 1
+                            if burst_counter % 2 == 0:
+                                create_bullet(player_x,player_y,angle,5)
+                                pygame.mixer.Sound.play(shoot_sound)
+                            if burst_counter == 20:
+                                burst_counter = 0
+                                bullet_counter = 0
 
-            if keys[pygame.K_q]:
-                booster_delay += 1
-                if booster_delay >= 10 and bombs > 0:
-                    create_bomb(player_x,player_y,5,angle)
-                    booster_delay = 0
-                    bombs -= 1
-                    booster_delay = 0
-            if keys[pygame.K_e]:
-                booster_delay += 1
-                if fire_rate_booster_count > 0 and booster_delay >= 10:
-                    fire_rate_booster_count -= 1
-                    fire_rate_boost = True
-                    bc = 2
-                    booster_delay = 0
-            if keys[pygame.K_LSHIFT]:
-                booster_delay += 1
-                if asteroid_slow > 0 and booster_delay >= 10:
-                    asteroid_slow -= 1
-                    High = 1
-                    Sec_High = 1
-                    Sec_Low = -1
-                    Low = -1
-                    slow = True
-                    booster_delay = 0
-            if slow == True:
-                slow_count += 1
-                if slow_count == 600:
-                    High = 4
-                    Sec_High = 2
-                    Sec_Low = -2
-                    Low = -4
-            if fire_rate_boost == True:
-                fire_rate_counter += 1
-                if fire_rate_counter == 600:
-                    bc = 10
-                    fire_rate_counter = 0
-                    fire_rate_boost = False
-            screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
-            center = [player_x, player_y + 25]
-            move_bullets()
-            move_asteroids()
-            counter += 1
-            if counter >= c:
-                add_asteroid(Low,Sec_Low,Sec_High,High,False)
-                counter = 0
-            for b in range(0,len(bullets)):
-                screen.blit(bullets[b][1],(bullets[b][2],bullets[b][3]))
-            for a in range(0,len(asteroids)):
-                screen.blit(asteroids[a][1],(asteroids[a][2],asteroids[a][3]))
-            hit_box = pygame.Rect(player_x,player_y,25,25)
-            if angle > 180:
-                angle = -180
-            if angle < -180:
-                angle = 180
-            x = len(bullets)-1
-            for b in range(x,-1,-1):
-             try:
-                for a in range(len(asteroids)-1,-1,-1):
-                    if bullets[b][0].colliderect(asteroids[a][0]['rect']):
-                        bullets.remove(bullets[b])
-                        if asteroids[a][9] == True:
-                            print("Here")
-                            detanate_asteroids(asteroids[a][2],asteroids[a][3],2,20)
-                            asteroids.remove(asteroids[a])
+                if keys[pygame.K_q]:
+                    booster_delay += 1
+                    if booster_delay >= 10 and bombs > 0:
+                        create_bomb(player_x,player_y,5,angle)
+                        booster_delay = 0
+                        bombs -= 1
+                        booster_delay = 0
+                if keys[pygame.K_e]:
+                    booster_delay += 1
+                    if fire_rate_booster_count > 0 and booster_delay >= 10:
+                        fire_rate_booster_count -= 1
+                        fire_rate_boost = True
+                        if bullet_type == 1:
+                            bc = 2
+                        elif bullet_type == 2:
+                            bc = 10
+                        elif bullet_type == 3:
+                            bc = 10
+                            
+                        
+                        booster_delay = 0
+                if keys[pygame.K_LSHIFT]:
+                    booster_delay += 1
+                    if asteroid_slow > 0 and booster_delay >= 10:
+                        asteroid_slow -= 1
+                        High = 1
+                        Sec_High = 1
+                        Sec_Low = -1
+                        Low = -1
+                        slow = True
+                        booster_delay = 0
+                if slow == True:
+                    slow_count += 1
+                    if slow_count == 600:
+                        High = 4
+                        Sec_High = 2
+                        Sec_Low = -2
+                        Low = -4
+                if fire_rate_boost == True:
+                    fire_rate_counter += 1
+                    if fire_rate_counter == 600:
+                        if bullet_type == 1:
+                            bc = 10
+                            fire_rate_counter = 0
+                            fire_rate_boost = False
+                        if bullet_type == 2:
+                            bc = 25
+                            fire_rate_counter = 0
+                            fire_rate_boost = False
+                        if bullet_type == 3:
+                            bc = 40
+                            fire_rate_counter = 0
+                            fire_rate_boost = False
+                screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
+                center = [player_x, player_y + 25]
+                move_bullets()
+                move_asteroids()
+                counter += 1
+                if counter >= c:
+                    add_asteroid(Low,Sec_Low,Sec_High,High,False)
+                    counter = 0
+                for b in range(0,len(bullets)):
+                    screen.blit(bullets[b][1],(bullets[b][2],bullets[b][3]))
+                for a in range(0,len(asteroids)):
+                    screen.blit(asteroids[a][1],(asteroids[a][2],asteroids[a][3]))
+                hit_box = pygame.Rect(player_x,player_y,25,25)
+                if angle > 180:
+                    angle = -180
+                if angle < -180:
+                    angle = 180
+                x = len(bullets)-1
+                for b in range(x,-1,-1):
+                 try:
+                    for a in range(len(asteroids)-1,-1,-1):
+                        if bullets[b][0].colliderect(asteroids[a][0]['rect']):
+                            bullets.remove(bullets[b])
+                            if asteroids[a][9] == True:
+                                detanate_asteroids(asteroids[a][2],asteroids[a][3],2,20)
+                                asteroids.remove(asteroids[a])
+                                score += 100
+                            else:
+                                asteroids.remove(asteroids[a])
+                                pygame.mixer.Sound.play(asteroid_explode)
                             score += 100
-                        else:
-                            asteroids.remove(asteroids[a])
-                            pygame.mixer.Sound.play(asteroid_explode)
-                        score += 100
-             except:
-                pass
-                
-            for a in range(len(asteroids)-1,-1,-1):
-                if hit_box.colliderect(asteroids[a][0]['rect']) and invicible == False:
-                    lifes -= 1
-                    asteroids.remove(asteroids[a])
-                    pygame.mixer.Sound.play(space_ship_explode)
-                    invicible = True
-                    invicible_timer = 3000
-                    if lifes == 0:
-                        choice = 3
-                else:
-                    invicible_timer -= 1
-                    if invicible_timer <= 0:
-                        invicible = False
-            score += 1
+                 except:
+                    pass
+                    
+                for a in range(len(asteroids)-1,-1,-1):
+                    if hit_box.colliderect(asteroids[a][0]['rect']) and invicible == False:
+                        lifes -= 1
+                        asteroids.remove(asteroids[a])
+                        pygame.mixer.Sound.play(space_ship_explode)
+                        invicible = True
+                        invicible_timer = 3000
+                        if lifes == 0:
+                            choice = 3
+                    else:
+                        invicible_timer -= 1
+                        if invicible_timer <= 0:
+                            invicible = False
+                score += 1
 
 
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -646,7 +703,6 @@ while running:
                 if bullets[b][0].colliderect(asteroids[a][0]['rect']):
                     bullets.remove(bullets[b])
                     if asteroids[a][9] == True:
-                        print("Here")
                         detanate_asteroids(asteroids[a][2],asteroids[a][3],2,20)
                         asteroids.remove(asteroids[a])
                     else:
