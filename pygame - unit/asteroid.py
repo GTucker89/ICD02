@@ -72,6 +72,69 @@ end_timer = 0
 bullet_type = None
 shooter_loop = True
 burst_counter = 0
+b_divide = 2
+power_up_choice_loop = True
+power_up_choice = None
+speed_boosts = 3
+mines = 3
+bullet_mods = 3
+decrease_difficulties = 3
+spiral_bombs = 3
+charged_bullets = 3
+mines_list = []
+player_speed = 3
+bullet_mod_check = False
+spiral_bomb_check = False
+spiral_bomb_ang = 0
+spiral_bomb_counter = 0
+charged_bullets_check = False
+charge_bullet_time_counter = 0
+charge_bullet_counter =0
+def create_bullet(x,y,ang,speed,boo):
+    if boo == False:
+        ang += 90
+        ang = math.radians(ang)
+        x_speed = speed * (math.cos(ang))
+        y_speed = speed * -1 *(math.sin(ang))
+        bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+        bullet_image = pygame.transform.scale(bullet_image,(10,10))
+        circle = pygame.Rect(x,y,10,10)
+        bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,boo,0]
+        bullets.append(bullet_info)
+    if boo == True:
+        ang += 90
+        print("here")
+        ang = math.radians(ang)
+        x_speed = speed * (math.cos(ang))
+        y_speed = speed * -1 *(math.sin(ang))
+        bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Charged_bullet.png')
+        bullet_image = pygame.transform.scale(bullet_image,(20,20))
+        circle = pygame.Rect(x,y,10,10)
+        bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,boo,0]
+        bullets.append(bullet_info) 
+def detanate_mine(x,y,boo):
+    ang = 0
+    ang += 90
+    if boo == False:
+        for b  in range(30):
+            ang += 1
+            x_speed = 5 *math.cos(ang)
+            y_speed = 5 * -1 * (math.sin(ang))
+            bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+            bullet_image = pygame.transform.scale(bullet_image,(10,10))
+            circle = pygame.Rect(x,y,10,10)
+            bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False,0]
+            bullets.append(bullet_info)
+    elif boo == True:
+        for b  in range(6):
+            ang += 1
+            x_speed = 5 *math.cos(ang)
+            y_speed = 5 * -1 * (math.sin(ang))
+            bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+            bullet_image = pygame.transform.scale(bullet_image,(10,10))
+            circle = pygame.Rect(x,y,10,10)
+            bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False,0]
+            bullets.append(bullet_info)
 def detanate_asteroids(x_new,y_new,speed,size):
     random_choice = random.randint(0,1)
     if random_choice == 0:
@@ -128,19 +191,6 @@ def detanate_asteroids(x_new,y_new,speed,size):
         y_speed -= 1
         if y_speed <= 0:
             x_speed -= 1
-def find_slope(p1,p2):
-    largest = 1
-    p1[1] = p1[1]*-1
-    p2[1] = p2[1]*-1
-    top = int(p2[1] - p1[1])
-    bottom = int(p2[0] - p1[0])
-    for i in range(top):
-        if i != 0:
-            if top / i == int and bottom / i == int and i != 0:
-                largest = i
-    top = top/largest
-    bottom = bottom/largest
-    return bottom, top
 def move_asteroids():
     for aaa in range(len(asteroids)-1,-1,-1 ):
         asteroids[aaa][2] += asteroids[aaa][4]
@@ -150,14 +200,47 @@ def move_asteroids():
             asteroids.remove(asteroids[aaa])
 def move_bullets():
     for b in range(len(bullets)-1,-1,-1):
+     try:
+        if bullets[b][6] == False:
+            try:
+                bullets[b][0] = pygame.Rect(bullets[b][2],bullets[b][3],10,10)
+                bullets[b][2] += bullets[b][4]
+                bullets[b][3] += bullets[b][5]
+                if bullets[b][2] >= 800 or bullets[b][2] <= 0 or bullets[b][3] >= 800 or bullets[b][3] <= 0:
+                    bullets.remove(bullets[b])
+            except:
+                pass
+        elif bullets[b][6] == True:
+                bullets[b][0] = pygame.Rect(bullets[b][2],bullets[b][3],10,10)
+                bullets[b][2] += bullets[b][4]
+                bullets[b][3] += bullets[b][5]
+                if bullets[b][2] > 800:
+                    bullets[b][2] = 1
+                if bullets[b][2] < 0:
+                    bullets[b][2] = 799
+                if bullets[b][3] < 0:
+                    bullets[b][3] = 799
+                if bullets[b][3] > 800:
+                    bullets[b][3] = 1
+                if bullets[b][7] >= 600:
+                    bullets.remove(bullets[b])
+                print(bullets[b][7])
+                bullets[b][7] += 1
+
+     except:
+         pass
+
+def move_mines():
+    for b in range(len(mines_list)-1,-1,-1):
         try:
-            bullets[b][0] = pygame.Rect(bullets[b][2],bullets[b][3],10,10)
-            bullets[b][2] += bullets[b][4]
-            bullets[b][3] += bullets[b][5]
-            if bullets[b][2] >= 800 or bullets[b][2] <= 0 or bullets[b][3] >= 800 or bullets[b][3] <= 0:
-                bullets.remove(bullets[b])
+            mines_list[b][0] = pygame.Rect(mines_list[b][2],mines_list[b][3],10,10)
+            mines_list[b][2] += mines_list[b][4]
+            mines_list[b][3] += mines_list[b][5]
+            if mines_list[b][2] >= 800 or mines_list[b][2] <= 0 or mines_list[b][3] >= 800 or mines_list[b][3] <= 0:
+                mines_list.remove(mines_list[b])
         except:
             pass
+
 def add_meteor(speed,size,x,y):
     astroid_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Asteroid 1.png')
     astroid_image = pygame.transform.scale(astroid_image,(size,size))
@@ -206,7 +289,31 @@ def add_asteroid(lowest,second_lowested,second_highest,highest,boo):
     asteroid_info.append(size)
     asteroid_info.append(boo)
     asteroids.append(asteroid_info)
-
+def create_mine(x,y):
+    ang = 0
+    for m in range(6):
+        x_speed = 3.5 *math.cos(ang)
+        y_speed = 3.5 * -1 * (math.sin(ang))
+        bullet_image = pygame.image.load('C:\\Users\GTucker\\ICD20.py\\pygame - unit\\Mine.png')
+        bullet_image = pygame.transform.scale(bullet_image,(25,25))
+        circle = pygame.Rect(x,y,10,10)
+        bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False]
+        mines_list.append(bullet_info)
+        if ang >= 180:
+            ang = -180
+        if ang <= -180:
+            ang = 180
+        ang += 45
+def create_explosive_bullet(x,y,ang):
+    ang += 90
+    ang = math.radians(ang)
+    x_speed = 5 *math.cos(ang)
+    y_speed = 5 * -1 * (math.sin(ang))
+    bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+    bullet_image = pygame.transform.scale(bullet_image,(10,10))
+    circle = pygame.Rect(x,y,10,10)
+    bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,True]
+    mines_list.append(bullet_info)
 def create_meteor_shower_line():
     num = WIDTH//100
     safe_area = random.randint(0,num - 3)
@@ -218,16 +325,7 @@ def create_meteor_shower_line():
         for ast in range(safe_area[1],num+1):
             add_meteor(2,100,ast*100,-10)
 
-def create_bullet(x,y,ang,speed):
-    ang += 90
-    ang = math.radians(ang)
-    x_speed = speed * (math.cos(ang))
-    y_speed = speed * -1 *(math.sin(ang))
-    bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
-    bullet_image = pygame.transform.scale(bullet_image,(10,10))
-    circle = pygame.Rect(x,y,10,10)
-    bullet_info = [circle,bullet_image,x,y,x_speed,y_speed]
-    bullets.append(bullet_info)
+
 def create_bomb(x,y,speed,ang):
     ang += 90
     for b  in range(50):
@@ -237,7 +335,7 @@ def create_bomb(x,y,speed,ang):
         bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
         bullet_image = pygame.transform.scale(bullet_image,(10,10))
         circle = pygame.Rect(x,y,10,10)
-        bullet_info = [circle,bullet_image,x,y,x_speed,y_speed]
+        bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False,0]
         bullets.append(bullet_info)
 def x_y_speeds(x,y,ang, speed):
     ang += 90
@@ -309,6 +407,24 @@ while running:
                  shooter_loop = False
                  bc = 40
             else:
+             if power_up_choice_loop == True:
+                power_up_choices1 = font.render(f"Press Q to select Asteroid Slowers, bombs, fire rate booster", True, 'black')
+                power_up_choices2 = font.render(f"Press W to select Speed Booster, Mines, Shooter Mod", True, 'black')
+                power_up_choices3 = font.render(f"Press E to select Decrease Difficulty, Spiral Bombs, Charge Bullets", True, 'black')
+                screen.blit(power_up_choices1,(10,50))
+                screen.blit(power_up_choices2,(10,100))
+                screen.blit(power_up_choices3,(10,150))
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_q]:
+                    power_up_choice = 1
+                    power_up_choice_loop = False
+                elif keys[pygame.K_w]:
+                    power_up_choice = 2
+                    power_up_choice_loop = False
+                elif keys[pygame.K_e]:
+                    power_up_choice = 3
+                    power_up_choice_loop = False
+             else:
                 timer_1 = font.render(f"Time Before Asteroid Storm: {int(Storm_Timer)}", True, 'black')
                 timer_2 = font.render(f"Time Before the Storm Ends: {int(active_timer)}", True, 'black')
                 if Storm_Timer > 0:
@@ -322,7 +438,7 @@ while running:
                         if event_storm == 2:
                             active_timer = 30
                 if active_timer > 0 and event_storm == 1:
-                    c  = difficunity -15
+                    c  = difficunity -10
                     active_timer -= clock.get_time() /1000
                     screen.blit(timer_2, (WIDTH//2 - 150, 50))
                     if active_timer <= 0:
@@ -364,36 +480,51 @@ while running:
                 bombs_left = font.render(f"Bombs Left: {int(bombs)}",True,'black')
                 slows_left = font.render(f"Asteroids Slowers Left: {int(asteroid_slow)}",True,'black')
                 lifes_lefts = font.render(f"Lifes Left: {int(lifes)}",True,'black')
-                screen.blit(slows_left,(WIDTH-300,HEIGHT-50))
+                mines_lefts = font.render(f"Mines Left: {int(mines)}",True,'black')
+                speed_boosts_lefts = font.render(f"Speed Boosters Left: {int(speed_boosts)}",True,'black')
+                charged_bullets_left = font.render(f"Charge Shots Left: {int(charged_bullets)}",True,'black')
+                decrease_difficulties_left = font.render(f"Decrease Difficulties Left: {int(decrease_difficulties)}",True,'black')
+                shooter_mods_lefts = font.render(f"Bullet Mods Left: {int(bullet_mods)}",True,'black')
+                spiral_bombs_lefts = font.render(f"Spiral Bombs Left: {int(spiral_bombs)}",True,'black')
                 screen.blit(lifes_lefts,(10,HEIGHT-50))
-                screen.blit(bombs_left,(WIDTH-180,10))
-                screen.blit(fire_rate_boosters_left,(10,10))
                 keys = pygame.key.get_pressed()
+                if power_up_choice == 1:
+                    screen.blit(slows_left,(WIDTH-300,HEIGHT-50))
+                    screen.blit(bombs_left,(WIDTH-180,10))
+                    screen.blit(fire_rate_boosters_left,(10,10))
+                elif power_up_choice == 2:
+                    screen.blit(speed_boosts_lefts,(WIDTH-300,HEIGHT-50))
+                    screen.blit(mines_lefts,(WIDTH-180,10))
+                    screen.blit(shooter_mods_lefts,(10,10))
+                elif power_up_choice == 3:
+                    screen.blit(decrease_difficulties_left,(WIDTH-300,HEIGHT-50))
+                    screen.blit(spiral_bombs_lefts,(WIDTH-280,10))
+                    screen.blit(charged_bullets_left,(10,10))
                 if keys[pygame.K_w]:
-                    x_speed, y_speed, center = x_y_speeds(player_x,player_x, angle, 3)
+                    x_speed, y_speed, center = x_y_speeds(player_x,player_x, angle, player_speed)
                     player_x += x_speed
                     player_y += y_speed
                     if player_x <= 0:
-                        player_x = WIDTH - 25
+                        player_x = WIDTH - 26
                     if player_x >= 775:
-                        player_x = 0
+                        player_x = 1
                     if player_y >= 775:
-                        player_y = 0
+                        player_y = 1
                     if player_y <= 0:
-                        player_y = HEIGHT - 25
+                        player_y = HEIGHT - 26
                     screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
                 if keys[pygame.K_s]:
-                    x_speed, y_speed, center = x_y_speeds(player_x,player_y,angle,3)
+                    x_speed, y_speed, center = x_y_speeds(player_x,player_y,angle,player_speed)
                     player_x -= x_speed
                     player_y -= y_speed
                     if player_x <= 0:
-                        player_x = 0 + WIDTH
+                        player_x = WIDTH - 26
                     if player_x >= 775:
-                        player_x = 775 - WIDTH
+                        player_x = 1
                     if player_y >= 775:
-                        player_y = 775 - HEIGHT
+                        player_y = 1
                     if player_y <= 0:
-                        player_y = 0 + HEIGHT
+                        player_y = HEIGHT - 26
                     screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
                 if keys[pygame.K_a]:
                     angle += 3
@@ -404,59 +535,146 @@ while running:
                 if keys[pygame.K_SPACE]:
                     bullet_counter += 1
                     if bullet_type == 1:
-                        if bullet_counter >= bc:
+                        if bullet_counter >= bc and bullet_mod_check == False:
                             bullet_counter = 0
+                            create_bullet(player_x,player_y,angle,5,False)
+                            pygame.mixer.Sound.play(shoot_sound)
+                        if bullet_counter >= bc and bullet_mod_check == True:
+                            bullet_counter = 0
+                            create_explosive_bullet(player_x,player_y,angle)
                             pygame.mixer.Sound.play(shoot_sound)
                     if bullet_type == 2:
-                        if bullet_counter >= bc:
+                        if bullet_counter >= bc and bullet_mod_check == False:
                             bullet_counter = 0
-                            create_bullet(player_x,player_y,angle,5) 
-                            create_bullet(player_x,player_y,angle + 5,5) 
-                            create_bullet(player_x,player_y,angle + 10,5) 
-                            create_bullet(player_x,player_y,angle - 5,5) 
-                            create_bullet(player_x,player_y,angle - 10,5) 
+                            create_bullet(player_x,player_y,angle,5,False) 
+                            create_bullet(player_x,player_y,angle + 5,5,False) 
+                            create_bullet(player_x,player_y,angle + 10,5,False) 
+                            create_bullet(player_x,player_y,angle - 5,5,False) 
+                            create_bullet(player_x,player_y,angle - 10,5,False) 
+                            pygame.mixer.Sound.play(shoot_sound)
+                        if bullet_counter >= bc and bullet_mod_check == True:
+                            bullet_counter = 0
+                            create_bullet(player_x,player_y,angle,5,False) 
+                            create_bullet(player_x,player_y,angle + 5,5,False) 
+                            create_bullet(player_x,player_y,angle + 10,5,False) 
+                            create_bullet(player_x,player_y,angle - 5,5,False) 
+                            create_bullet(player_x,player_y,angle - 10,5,False) 
+                            create_bullet(player_x,player_y,angle + 15,5,False) 
+                            create_bullet(player_x,player_y,angle + 20,5,False) 
+                            create_bullet(player_x,player_y,angle - 15,5,False) 
+                            create_bullet(player_x,player_y,angle - 20,5,False) 
+                            if angle < 0:
+                                new_angle = angle + 360
+                            else:
+                                new_angle = angle
+                            create_bullet(player_x,player_y,angle + 180,5,False) 
+                            create_bullet(player_x,player_y,angle + 180 + 5,5,False) 
+                            create_bullet(player_x,player_y,angle + 180 + 10,5,False) 
+                            create_bullet(player_x,player_y,angle + 180 - 5,5,False) 
+                            create_bullet(player_x,player_y,angle + 180- 10,5,False) 
+                            create_bullet(player_x,player_y,angle + 180 + 15,5,False) 
+                            create_bullet(player_x,player_y,angle + 180 + 15,5,False) 
+                            create_bullet(player_x,player_y,angle + 180 - 15,5,False) 
+                            create_bullet(player_x,player_y,angle + 180- 20,5,False) 
                             pygame.mixer.Sound.play(shoot_sound)
                     if bullet_type == 3:
-                        if bullet_counter >= bc:
+                        if bullet_counter >= bc and bullet_mod_check == False:
                             burst_counter += 1
-                            if burst_counter % 2 == 0:
-                                create_bullet(player_x,player_y,angle,5)
+                            if burst_counter % b_divide == 0:
+                                create_bullet(player_x,player_y,angle,5,False)
                                 pygame.mixer.Sound.play(shoot_sound)
-                            if burst_counter == 20:
+                            if burst_counter >= 20:
                                 burst_counter = 0
                                 bullet_counter = 0
-
+                        if bullet_counter >= bc and bullet_mod_check == True:
+                            burst_counter += 1
+                            create_bullet(player_x,player_y,angle - 30,5,False)
+                            create_bullet(player_x,player_y,angle,5,False)
+                            create_bullet(player_x,player_y, angle + 30,5,False)
+                            pygame.mixer.Sound.play(shoot_sound)
+                            if burst_counter == 40:
+                                burst_counter = 0
+                                bullet_counter = 0
+                    if charged_bullets_check == True:
+                        charge_bullet_counter += 1
+                        charge_bullet_time_counter += 1
+                        if charge_bullet_counter >= 60:
+                            create_bullet(player_x,player_y, angle,5,True)
+                            charge_bullet_counter = 0
+                            pygame.mixer.Sound.play(shoot_sound)
+                        if charge_bullet_time_counter >= 600:
+                            charged_bullets_check = False
+                            charge_bullet_counter = 0
+                        
                 if keys[pygame.K_q]:
                     booster_delay += 1
-                    if booster_delay >= 10 and bombs > 0:
-                        create_bomb(player_x,player_y,5,angle)
-                        booster_delay = 0
-                        bombs -= 1
-                        booster_delay = 0
+                    if power_up_choice == 1:
+                        if booster_delay >= 10 and bombs > 0:
+                            create_bomb(player_x,player_y,5,angle)
+                            booster_delay = 0
+                            bombs -= 1
+                            booster_delay = 0
+                    elif power_up_choice == 2:
+                        if booster_delay >= 10 and mines > 0:
+                            create_mine(player_x,player_y)
+                            booster_delay = 0
+                            mines -= 1
+                    elif power_up_choice == 3:
+                        if booster_delay >= 10 and spiral_bombs > 0:
+                            spiral_bomb_check = True
+                            booster_delay = 0
+                            spiral_bombs -= 1
+    
                 if keys[pygame.K_e]:
                     booster_delay += 1
-                    if fire_rate_booster_count > 0 and booster_delay >= 10:
-                        fire_rate_booster_count -= 1
-                        fire_rate_boost = True
-                        if bullet_type == 1:
-                            bc = 2
-                        elif bullet_type == 2:
-                            bc = 10
-                        elif bullet_type == 3:
-                            bc = 10
-                            
-                        
+                    if power_up_choice == 1:
+                        if fire_rate_booster_count > 0 and booster_delay >= 10:
+                            fire_rate_booster_count -= 1
+                            fire_rate_boost = True
+                            if bullet_type == 1:
+                                bc = 2
+                            elif bullet_type == 2:
+                                bc = 10
+                            elif bullet_type == 3:
+                                bc = 10
+                                b_divide = 1   
                         booster_delay = 0
+                    if power_up_choice == 2:
+                        if bullet_mods > 0 and booster_delay >= 10:
+                            bullet_mods -= 1
+                            bullet_mod_check = True
+                            booster_delay = 0
+                    if power_up_choice == 3:
+                        if charged_bullets > 0 and booster_delay >= 10:
+                            charged_bullets -= 1
+                            charged_bullets_check = True
+                            booster_delay = 0
                 if keys[pygame.K_LSHIFT]:
                     booster_delay += 1
-                    if asteroid_slow > 0 and booster_delay >= 10:
-                        asteroid_slow -= 1
-                        High = 1
-                        Sec_High = 1
-                        Sec_Low = -1
-                        Low = -1
-                        slow = True
-                        booster_delay = 0
+                    if power_up_choice == 1:
+                        if asteroid_slow > 0 and booster_delay >= 10:
+                            asteroid_slow -= 1
+                            High = 1
+                            Sec_High = 1
+                            Sec_Low = -1
+                            Low = -1
+                            slow = True
+                            booster_delay = 0
+                    if power_up_choice == 2:
+                        if speed_boosts > 0 and booster_delay >= 10:
+                            speed_boosts -= 1
+                            slow = True
+                            player_speed = 6
+                            booster_delay = 0
+                    if power_up_choice == 3:
+                        if decrease_difficulties > 0 and booster_delay >= 10:
+                            decrease_difficulties -= 1
+                            difficunity += 2
+                if bullet_mod_check == True:
+                    fire_rate_booster_count += 1
+                    if fire_rate_booster_count >= 600:
+                        fire_rate_booster_count = 0
+                        bullet_mod_check = False
                 if slow == True:
                     slow_count += 1
                     if slow_count == 600:
@@ -464,6 +682,10 @@ while running:
                         Sec_High = 2
                         Sec_Low = -2
                         Low = -4
+                if slow == True:
+                    slow_count += 1
+                    if slow_count == 600:
+                        player_speed = 3
                 if fire_rate_boost == True:
                     fire_rate_counter += 1
                     if fire_rate_counter == 600:
@@ -477,13 +699,26 @@ while running:
                             fire_rate_boost = False
                         if bullet_type == 3:
                             bc = 40
+                            b_divide = 2
                             fire_rate_counter = 0
                             fire_rate_boost = False
+                if spiral_bomb_check == True:
+                    spiral_bomb_counter += 1
+                    spiral_bomb_ang += 3
+                    print(spiral_bomb_check)
+                    create_bullet(player_x,player_y,spiral_bomb_ang,5,False)
+                    create_bullet(player_x,player_y,spiral_bomb_ang+180,5,False)
+                    if spiral_bomb_counter >= 120:
+                        spiral_bomb_check = False
+                        spiral_bomb_counter = 0
+
                 screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
                 center = [player_x, player_y + 25]
                 move_bullets()
                 move_asteroids()
+                move_mines()
                 counter += 1
+                c = difficunity
                 if counter >= c:
                     add_asteroid(Low,Sec_Low,Sec_High,High,False)
                     counter = 0
@@ -491,17 +726,51 @@ while running:
                     screen.blit(bullets[b][1],(bullets[b][2],bullets[b][3]))
                 for a in range(0,len(asteroids)):
                     screen.blit(asteroids[a][1],(asteroids[a][2],asteroids[a][3]))
+                for cc in range(0,len(mines_list)):
+                    screen.blit(mines_list[cc][1],(mines_list[cc][2],mines_list[cc][3]))
+                
                 hit_box = pygame.Rect(player_x,player_y,25,25)
                 if angle > 180:
                     angle = -180
                 if angle < -180:
                     angle = 180
-                x = len(bullets)-1
-                for b in range(x,-1,-1):
+                
+                for b in range(len(bullets)-1,-1,-1):
+                 if bullets[b][6] == False:
+                    try:
+                        for a in range(len(asteroids)-1,-1,-1):
+                            if bullets[b][0].colliderect(asteroids[a][0]['rect']):
+                                bullets.remove(bullets[b])
+                                if asteroids[a][9] == True:
+                                    detanate_asteroids(asteroids[a][2],asteroids[a][3],2,20)
+                                    asteroids.remove(asteroids[a])
+                                    score += 100
+                                else:
+                                    asteroids.remove(asteroids[a])
+                                    pygame.mixer.Sound.play(asteroid_explode)
+                                score += 100
+                    except:
+                        pass
+                 elif bullets[b][6] == True:
+                    try:
+                        for a in range(len(asteroids)-1,-1,-1):
+                            if bullets[b][0].colliderect(asteroids[a][0]['rect']):
+                                if asteroids[a][9] == True:
+                                    detanate_asteroids(asteroids[a][2],asteroids[a][3],2,20)
+                                    asteroids.remove(asteroids[a])
+                                    score += 100
+                                else:
+                                    asteroids.remove(asteroids[a])
+                                    pygame.mixer.Sound.play(asteroid_explode)
+                                score += 100
+                    except:
+                        pass
+                for m in range(len(mines_list)-1,-1,-1):
                  try:
                     for a in range(len(asteroids)-1,-1,-1):
-                        if bullets[b][0].colliderect(asteroids[a][0]['rect']):
-                            bullets.remove(bullets[b])
+                        if mines_list[m][0].colliderect(asteroids[a][0]['rect']):
+                            detanate_mine(mines_list[m][2],mines_list[m][3],mines_list[m][6])
+                            mines_list.remove(mines_list[m])
                             if asteroids[a][9] == True:
                                 detanate_asteroids(asteroids[a][2],asteroids[a][3],2,20)
                                 asteroids.remove(asteroids[a])
@@ -511,8 +780,7 @@ while running:
                                 pygame.mixer.Sound.play(asteroid_explode)
                             score += 100
                  except:
-                    pass
-                    
+                    pass   
                 for a in range(len(asteroids)-1,-1,-1):
                     if hit_box.colliderect(asteroids[a][0]['rect']) and invicible == False:
                         lifes -= 1
@@ -604,7 +872,7 @@ while running:
         screen.blit(fire_rate_boosters_left,(10,10))
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
-            x_speed, y_speed, center = x_y_speeds(player_x,player_x, angle, 3)
+            x_speed, y_speed, center = x_y_speeds(player_x,player_x, angle, player_speed)
             player_x += x_speed
             player_y += y_speed
             if player_x <= 0:
@@ -617,7 +885,7 @@ while running:
                 player_y = HEIGHT - 25
             screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
         if keys[pygame.K_s]:
-            x_speed, y_speed, center = x_y_speeds(player_x,player_y,angle,3)
+            x_speed, y_speed, center = x_y_speeds(player_x,player_y,angle,player_speed)
             player_x -= x_speed
             player_y -= y_speed
             if player_x <= 0:
@@ -639,7 +907,7 @@ while running:
             bullet_counter += 1
             if bullet_counter >= bc:
                 bullet_counter = 0
-                create_bullet(player_x,player_y,angle,5)
+                create_bullet(player_x,player_y,angle,5,False)
                 pygame.mixer.Sound.play(shoot_sound)
 
         if keys[pygame.K_q]:
