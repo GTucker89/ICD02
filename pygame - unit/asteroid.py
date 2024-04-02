@@ -90,6 +90,7 @@ spiral_bomb_counter = 0
 charged_bullets_check = False
 charge_bullet_time_counter = 0
 charge_bullet_counter =0
+big_storm_check = True
 def create_bullet(x,y,ang,speed,boo):
     if boo == False:
         ang += 90
@@ -439,15 +440,21 @@ while running:
                             active_timer = 30
                 if active_timer > 0 and event_storm == 1:
                     c  = difficunity -10
+                    if big_storm_check == True:
+                        difficunity -= 10
+                        big_storm_check =False
                     active_timer -= clock.get_time() /1000
                     screen.blit(timer_2, (WIDTH//2 - 150, 50))
                     if active_timer <= 0:
                         difficunity -= 2
+                        difficunity += 10
                         c = difficunity
                         Storm_Timer = 30
                         fire_rate_booster_count += 1
                         bombs += 1
                         asteroid_slow += 1
+                        event_storm = random.randint(0,2)
+                        big_storm_check = True
                 if active_timer > 0 and event_storm == 0:
                     active_timer -= clock.get_time() / 1000
                     screen.blit(timer_2,(WIDTH//2 - 150, 50))
@@ -462,6 +469,7 @@ while running:
                         fire_rate_booster_count += 1
                         bombs += 1
                         asteroid_slow += 1
+                        event_storm = random.randint(0,2)
                 if active_timer > 0 and event_storm == 2:
                     active_timer -= clock.get_time() / 1000
                     screen.blit(timer_2,(WIDTH//2 - 150, 50))
@@ -476,6 +484,7 @@ while running:
                         fire_rate_booster_count += 1
                         bombs += 1
                         asteroid_slow += 1
+                        event_storm = random.randint(0,2)
                 fire_rate_boosters_left = font.render(f"Fire Rate Boosters Left: {int(fire_rate_booster_count)}",True,'black')
                 bombs_left = font.render(f"Bombs Left: {int(bombs)}",True,'black')
                 slows_left = font.render(f"Asteroids Slowers Left: {int(asteroid_slow)}",True,'black')
@@ -705,7 +714,6 @@ while running:
                 if spiral_bomb_check == True:
                     spiral_bomb_counter += 1
                     spiral_bomb_ang += 3
-                    print(spiral_bomb_check)
                     create_bullet(player_x,player_y,spiral_bomb_ang,5,False)
                     create_bullet(player_x,player_y,spiral_bomb_ang+180,5,False)
                     if spiral_bomb_counter >= 120:
@@ -719,6 +727,7 @@ while running:
                 move_mines()
                 counter += 1
                 c = difficunity
+                print(difficunity)
                 if counter >= c:
                     add_asteroid(Low,Sec_Low,Sec_High,High,False)
                     counter = 0
