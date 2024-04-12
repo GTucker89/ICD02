@@ -5,6 +5,8 @@ import random
 import time
 
 pygame.init()
+#Create all variables
+death_sound_check = True
 HEIGHT = 800
 WIDTH = 800
 random_choice = None
@@ -22,13 +24,15 @@ line_counter = 60
 lifes = 3
 bullet_counter = 0
 bomb_counter =0
-space_ship = pygame.image.load('C:\\Users\GTucker\\ICD20.py\\pygame - unit\\Spaceship.png')
+space_ship = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Spaceship.png')
+background = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Background for game.png')
+background = pygame.transform.scale(background,(900,900))
 #Not greater than positive 180
 angle = -90
 fire_rate_counter = 0
 center_screen_x = WIDTH//2
 center_screen_y = HEIGHT//2
-space_ship = pygame.transform.scale(space_ship,(25,25))
+space_ship = pygame.transform.scale(space_ship,(30,30))
 bombs = 3
 slow_count = 0
 fire_rate_booster_count = 3
@@ -46,6 +50,7 @@ Storm_Timer = 30
 active_timer = 0
 difficunity = 20
 event_storm = random.randint(0,2)
+death_sound = pygame.mixer.Sound('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Death Sound.wav')
 shoot_sound = pygame.mixer.Sound('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\fire.wav')
 asteroid_explode = pygame.mixer.Sound('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\bangSmall.wav')
 space_ship_explode = pygame.mixer.Sound('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\bangLarge.wav')
@@ -91,20 +96,22 @@ charged_bullets_check = False
 charge_bullet_time_counter = 0
 charge_bullet_counter =0
 big_storm_check = True
+#creates player bullets
 def create_bullet(x,y,ang,speed,boo):
+    #creates normal bullet
     if boo == False:
         ang += 90
         ang = math.radians(ang)
         x_speed = speed * (math.cos(ang))
         y_speed = speed * -1 *(math.sin(ang))
-        bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+        bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Good Bullet.png')
         bullet_image = pygame.transform.scale(bullet_image,(10,10))
         circle = pygame.Rect(x,y,10,10)
         bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,boo,0]
         bullets.append(bullet_info)
+    #creates charged bullet
     if boo == True:
         ang += 90
-        print("here")
         ang = math.radians(ang)
         x_speed = speed * (math.cos(ang))
         y_speed = speed * -1 *(math.sin(ang))
@@ -113,30 +120,34 @@ def create_bullet(x,y,ang,speed,boo):
         circle = pygame.Rect(x,y,10,10)
         bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,boo,0]
         bullets.append(bullet_info) 
+# blows up mines when they collide with other asteroids
 def detanate_mine(x,y,boo):
     ang = 0
     ang += 90
+    #Used for normal mines
     if boo == False:
         for b  in range(30):
             ang += 1
-            x_speed = 5 *math.cos(ang)
-            y_speed = 5 * -1 * (math.sin(ang))
-            bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+            x_speed = 2 *math.cos(ang)
+            y_speed = 2 * -1 * (math.sin(ang))
+            bullet_image = pygame.image.load('C:\\Users\GTucker\\ICD20.py\\pygame - unit\\Good Bullet.png')
             bullet_image = pygame.transform.scale(bullet_image,(10,10))
             circle = pygame.Rect(x,y,10,10)
             bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False,0]
             bullets.append(bullet_info)
+    #used for exploding bullets
     elif boo == True:
         for b  in range(6):
             ang += 1
-            x_speed = 5 *math.cos(ang)
-            y_speed = 5 * -1 * (math.sin(ang))
-            bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+            x_speed = 2 *math.cos(ang)
+            y_speed = 2 * -1 * (math.sin(ang))
+            bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Good Bullet.png')
             bullet_image = pygame.transform.scale(bullet_image,(10,10))
             circle = pygame.Rect(x,y,10,10)
             bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False,0]
             bullets.append(bullet_info)
 def detanate_asteroids(x_new,y_new,speed,size):
+    # Makes the asteroids explode when they are destroyed by bullets
     random_choice = random.randint(0,1)
     if random_choice == 0:
         x_speed = random.randint(-2,2)
@@ -145,7 +156,7 @@ def detanate_asteroids(x_new,y_new,speed,size):
         y_speed = -1* random.randint(-2,2)
         x_speed = random.randint(-2,2)
     for x in range(4):
-        astroid_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Spaceship.png')
+        astroid_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Asteroid 1.png')
         astroid_image = pygame.transform.scale(astroid_image,(size,size))
         circle = {'rect': pygame.Rect(x_new, y_new, 2*size, 2*size), 'color': 'black', 'radius': size}
         asteroid_info = [circle,astroid_image,x_new,y_new,x_speed,y_speed]
@@ -193,6 +204,7 @@ def detanate_asteroids(x_new,y_new,speed,size):
         if y_speed <= 0:
             x_speed -= 1
 def move_asteroids():
+    #Moves all asteroids that are on the screen
     for aaa in range(len(asteroids)-1,-1,-1 ):
         asteroids[aaa][2] += asteroids[aaa][4]
         asteroids[aaa][3] += asteroids[aaa][5]
@@ -200,8 +212,10 @@ def move_asteroids():
         if asteroids[aaa][2] >= 850 or asteroids[aaa][2] <= -50 or asteroids[aaa][3] >= 850 or asteroids[aaa][3] <= -50:
             asteroids.remove(asteroids[aaa])
 def move_bullets():
+    #moves all bullets on the screen
     for b in range(len(bullets)-1,-1,-1):
      try:
+        #Moves normal bullets
         if bullets[b][6] == False:
             try:
                 bullets[b][0] = pygame.Rect(bullets[b][2],bullets[b][3],10,10)
@@ -211,6 +225,7 @@ def move_bullets():
                     bullets.remove(bullets[b])
             except:
                 pass
+        #Moves charged bullets
         elif bullets[b][6] == True:
                 bullets[b][0] = pygame.Rect(bullets[b][2],bullets[b][3],10,10)
                 bullets[b][2] += bullets[b][4]
@@ -225,13 +240,13 @@ def move_bullets():
                     bullets[b][3] = 1
                 if bullets[b][7] >= 600:
                     bullets.remove(bullets[b])
-                print(bullets[b][7])
                 bullets[b][7] += 1
 
      except:
          pass
 
 def move_mines():
+    #Moves all mines and exploding bullets
     for b in range(len(mines_list)-1,-1,-1):
         try:
             mines_list[b][0] = pygame.Rect(mines_list[b][2],mines_list[b][3],10,10)
@@ -243,6 +258,7 @@ def move_mines():
             pass
 
 def add_meteor(speed,size,x,y):
+    # Adds a meteor at the top of the screen that moves down and cannot be destroyed
     astroid_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Asteroid 1.png')
     astroid_image = pygame.transform.scale(astroid_image,(size,size))
     y_speed_meteor = speed
@@ -252,6 +268,7 @@ def add_meteor(speed,size,x,y):
     asteroid_info = [circle,astroid_image,x,y,x_speed_meteor,y_speed_meteor,end_height,"h",size]
     asteroids.append(asteroid_info)
 def add_asteroid(lowest,second_lowested,second_highest,highest,boo):
+    # Adds asteroids and randomizes their movements
     size = random.randint(10,101)
     checker = random.randint(0,1)
     end_width = None
@@ -291,10 +308,11 @@ def add_asteroid(lowest,second_lowested,second_highest,highest,boo):
     asteroid_info.append(boo)
     asteroids.append(asteroid_info)
 def create_mine(x,y):
+    # Creates six mines around the player
     ang = 0
     for m in range(6):
-        x_speed = 3.5 *math.cos(ang)
-        y_speed = 3.5 * -1 * (math.sin(ang))
+        x_speed = 0.75 *math.cos(ang)
+        y_speed = 0.75 * -1 * (math.sin(ang))
         bullet_image = pygame.image.load('C:\\Users\GTucker\\ICD20.py\\pygame - unit\\Mine.png')
         bullet_image = pygame.transform.scale(bullet_image,(25,25))
         circle = pygame.Rect(x,y,10,10)
@@ -306,16 +324,18 @@ def create_mine(x,y):
             ang = 180
         ang += 45
 def create_explosive_bullet(x,y,ang):
+    #creates a single mine that goes towards the player direction and looks like a bullet
     ang += 90
     ang = math.radians(ang)
     x_speed = 5 *math.cos(ang)
     y_speed = 5 * -1 * (math.sin(ang))
-    bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+    bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Good Bullet.png')
     bullet_image = pygame.transform.scale(bullet_image,(10,10))
     circle = pygame.Rect(x,y,10,10)
     bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,True]
     mines_list.append(bullet_info)
 def create_meteor_shower_line():
+    #creates a line of indestructible meteors at the top of the screen
     num = WIDTH//100
     safe_area = random.randint(0,num - 3)
     safe_area = [safe_area, safe_area + 3]
@@ -328,17 +348,19 @@ def create_meteor_shower_line():
 
 
 def create_bomb(x,y,speed,ang):
+    #creates a ring of bullets around the player
     ang += 90
     for b  in range(50):
         ang += 1
         x_speed = speed *math.cos(ang)
         y_speed = speed * -1 * (math.sin(ang))
-        bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Bullet.png')
+        bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Good Bullet.png')
         bullet_image = pygame.transform.scale(bullet_image,(10,10))
         circle = pygame.Rect(x,y,10,10)
         bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False,0]
         bullets.append(bullet_info)
 def x_y_speeds(x,y,ang, speed):
+    #creates the speed of the player based off an angle
     ang += 90
     image = pygame.transform.rotate(space_ship, -ang)
     rect = image.get_rect(center=(x, y))
@@ -347,11 +369,12 @@ def x_y_speeds(x,y,ang, speed):
     y_speed = speed * -1 *(math.sin(ang))
     return x_speed, y_speed, rect
 while running:
-
-    screen.fill('white')
+    #Fills the screen
+    screen.blit(background,(0,0))
     if first_lope == True:
-        tutorial_text1 = font.render(f"Press 1 to continue to the main game.",True,'black')
-        tutorial_text2 = font.render(f"Press 2 to continue to the tutorial", True, 'black')
+        #asks the player if the want to do the tutorial or the main game
+        tutorial_text1 = font.render(f"Press 1 to continue to the main game.",True,'white')
+        tutorial_text2 = font.render(f"Press 2 to continue to the tutorial", True, 'white')
         screen.blit(tutorial_text1,(150, HEIGHT// 2 -100))
         screen.blit(tutorial_text2,(150, HEIGHT// 2  + 100))
         keys = pygame.key.get_pressed()
@@ -364,10 +387,11 @@ while running:
             lifes = 999
 #MAIN GAME
     elif choice == 1:
-        difficunity_text1 = font.render(f"Press q to play on Easy Mode",True,'black')
-        difficunity_text2 = font.render(f"Press w to play on Medium Mode",True,'black')
-        difficunity_text3 = font.render(f"Press e to play on Hard Mode",True,'black')
-        score_text = font.render(f"Your score is: {score}!",True,'black')
+        #Asks the player what difficunty they want to done
+        difficunity_text1 = font.render(f"Press q to play on Easy Mode",True,'white')
+        difficunity_text2 = font.render(f"Press w to play on Medium Mode",True,'white')
+        difficunity_text3 = font.render(f"Press e to play on Hard Mode",True,'white')
+        score_text = font.render(f"Your score is: {score}!",True,'white')
         if difficunity_loop == True:
             screen.blit(difficunity_text1,(100,HEIGHT- 700))
             screen.blit(difficunity_text2,(100,HEIGHT- 600))
@@ -387,10 +411,11 @@ while running:
                 difficunity_loop = False
 
         if difficunity_loop == False:
+            #asks the player want shoot they want
             if shooter_loop == True:
-             shooter_option_1 = font.render(f"Press 1 to select classic shooter",True,'black')
-             shooter_option_2 = font.render(f"Press 2 to select Shotgun shooter",True,'black')
-             shooter_option_3 = font.render(f"Press 3 to select Burst shooter",True,'black')
+             shooter_option_1 = font.render(f"Press 1 to select classic shooter",True,'white')
+             shooter_option_2 = font.render(f"Press 2 to select Shotgun shooter",True,'white')
+             shooter_option_3 = font.render(f"Press 3 to select Burst shooter",True,'white')
              screen.blit(shooter_option_1,(WIDTH//2-100,HEIGHT//2 - 100))
              screen.blit(shooter_option_2,(WIDTH//2-100,HEIGHT//2 ))
              screen.blit(shooter_option_3,(WIDTH//2-100,HEIGHT//2 + 100))
@@ -408,10 +433,11 @@ while running:
                  shooter_loop = False
                  bc = 40
             else:
+             #asks the player want powerups they want
              if power_up_choice_loop == True:
-                power_up_choices1 = font.render(f"Press Q to select Asteroid Slowers, bombs, fire rate booster", True, 'black')
-                power_up_choices2 = font.render(f"Press W to select Speed Booster, Mines, Shooter Mod", True, 'black')
-                power_up_choices3 = font.render(f"Press E to select Decrease Difficulty, Spiral Bombs, Charge Bullets", True, 'black')
+                power_up_choices1 = font.render(f"Press Q to select Asteroid Slowers, bombs, fire rate booster", True, 'white')
+                power_up_choices2 = font.render(f"Press W to select Speed Booster, Mines, Shooter Mod", True, 'white')
+                power_up_choices3 = font.render(f"Press E to select Decrease Difficulty, Spiral Bombs, Charge Bullets", True, 'white')
                 screen.blit(power_up_choices1,(10,50))
                 screen.blit(power_up_choices2,(10,100))
                 screen.blit(power_up_choices3,(10,150))
@@ -426,8 +452,11 @@ while running:
                     power_up_choice = 3
                     power_up_choice_loop = False
              else:
-                timer_1 = font.render(f"Time Before Asteroid Storm: {int(Storm_Timer)}", True, 'black')
-                timer_2 = font.render(f"Time Before the Storm Ends: {int(active_timer)}", True, 'black')
+                #Game begins
+                screen.blit(background,(0,0))
+                timer_1 = font.render(f"Time Before Asteroid Storm: {int(Storm_Timer)}", True, 'white')
+                timer_2 = font.render(f"Time Before the Storm Ends: {int(active_timer)}", True, 'white')
+                #Checks to see if there is time before the next storm
                 if Storm_Timer > 0:
                     Storm_Timer -= clock.get_time() / 1000
                     screen.blit(timer_1, (WIDTH//2 - 150, 50))
@@ -438,6 +467,7 @@ while running:
                             active_timer = 10
                         if event_storm == 2:
                             active_timer = 30
+                #If the active timer is greater than zero and the storm equals one it greatly increases spawn rate
                 if active_timer > 0 and event_storm == 1:
                     c  = difficunity -10
                     if big_storm_check == True:
@@ -450,11 +480,19 @@ while running:
                         difficunity += 10
                         c = difficunity
                         Storm_Timer = 30
-                        fire_rate_booster_count += 1
+                        mines += 1
+                        lifes += 1
                         bombs += 1
+                        fire_rate_booster_count += 1
                         asteroid_slow += 1
+                        speed_boosts += 1
+                        bullet_mods += 1
+                        decrease_difficulties += 1
+                        spiral_bombs += 1
+                        charged_bullets += 1
                         event_storm = random.randint(0,2)
                         big_storm_check = True
+                #If the active timer is greater than zero and the storm equals 0 it spawns lines of meteors at the top of the screen
                 if active_timer > 0 and event_storm == 0:
                     active_timer -= clock.get_time() / 1000
                     screen.blit(timer_2,(WIDTH//2 - 150, 50))
@@ -466,10 +504,18 @@ while running:
                         difficunity -= 2
                         c = difficunity
                         Storm_Timer = 30
-                        fire_rate_booster_count += 1
+                        mines += 1
+                        lifes += 1
                         bombs += 1
+                        fire_rate_booster_count += 1
                         asteroid_slow += 1
+                        speed_boosts += 1
+                        bullet_mods += 1
+                        decrease_difficulties += 1
+                        spiral_bombs += 1
+                        charged_bullets += 1
                         event_storm = random.randint(0,2)
+                #If the active timer is greater than zero and the storm equals two asteroids will randomly have the chance to explode
                 if active_timer > 0 and event_storm == 2:
                     active_timer -= clock.get_time() / 1000
                     screen.blit(timer_2,(WIDTH//2 - 150, 50))
@@ -481,22 +527,31 @@ while running:
                         difficunity -= 2
                         c = difficunity
                         Storm_Timer = 30
-                        fire_rate_booster_count += 1
+                        mines += 1
+                        lifes += 1
                         bombs += 1
+                        fire_rate_booster_count += 1
                         asteroid_slow += 1
+                        speed_boosts += 1
+                        bullet_mods += 1
+                        decrease_difficulties += 1
+                        spiral_bombs += 1
+                        charged_bullets += 1
                         event_storm = random.randint(0,2)
-                fire_rate_boosters_left = font.render(f"Fire Rate Boosters Left: {int(fire_rate_booster_count)}",True,'black')
-                bombs_left = font.render(f"Bombs Left: {int(bombs)}",True,'black')
-                slows_left = font.render(f"Asteroids Slowers Left: {int(asteroid_slow)}",True,'black')
-                lifes_lefts = font.render(f"Lifes Left: {int(lifes)}",True,'black')
-                mines_lefts = font.render(f"Mines Left: {int(mines)}",True,'black')
-                speed_boosts_lefts = font.render(f"Speed Boosters Left: {int(speed_boosts)}",True,'black')
-                charged_bullets_left = font.render(f"Charge Shots Left: {int(charged_bullets)}",True,'black')
-                decrease_difficulties_left = font.render(f"Decrease Difficulties Left: {int(decrease_difficulties)}",True,'black')
-                shooter_mods_lefts = font.render(f"Bullet Mods Left: {int(bullet_mods)}",True,'black')
-                spiral_bombs_lefts = font.render(f"Spiral Bombs Left: {int(spiral_bombs)}",True,'black')
+                #creats all the text
+                fire_rate_boosters_left = font.render(f"Fire Rate Boosters Left: {int(fire_rate_booster_count)}",True,'white')
+                bombs_left = font.render(f"Bombs Left: {int(bombs)}",True,'white')
+                slows_left = font.render(f"Asteroids Slowers Left: {int(asteroid_slow)}",True,'white')
+                lifes_lefts = font.render(f"Lifes Left: {int(lifes)}",True,'white')
+                mines_lefts = font.render(f"Mines Left: {int(mines)}",True,'white')
+                speed_boosts_lefts = font.render(f"Speed Boosters Left: {int(speed_boosts)}",True,'white')
+                charged_bullets_left = font.render(f"Charge Shots Left: {int(charged_bullets)}",True,'white')
+                decrease_difficulties_left = font.render(f"Decrease Difficulties Left: {int(decrease_difficulties)}",True,'white')
+                shooter_mods_lefts = font.render(f"Bullet Mods Left: {int(bullet_mods)}",True,'white')
+                spiral_bombs_lefts = font.render(f"Spiral Bombs Left: {int(spiral_bombs)}",True,'white')
                 screen.blit(lifes_lefts,(10,HEIGHT-50))
                 keys = pygame.key.get_pressed()
+                #Blits the main text displaying info
                 if power_up_choice == 1:
                     screen.blit(slows_left,(WIDTH-300,HEIGHT-50))
                     screen.blit(bombs_left,(WIDTH-180,10))
@@ -506,9 +561,10 @@ while running:
                     screen.blit(mines_lefts,(WIDTH-180,10))
                     screen.blit(shooter_mods_lefts,(10,10))
                 elif power_up_choice == 3:
-                    screen.blit(decrease_difficulties_left,(WIDTH-300,HEIGHT-50))
+                    screen.blit(decrease_difficulties_left,(WIDTH-400,HEIGHT-50))
                     screen.blit(spiral_bombs_lefts,(WIDTH-280,10))
                     screen.blit(charged_bullets_left,(10,10))
+                #Causes actions and movements based on buttons pressed
                 if keys[pygame.K_w]:
                     x_speed, y_speed, center = x_y_speeds(player_x,player_x, angle, player_speed)
                     player_x += x_speed
@@ -607,13 +663,14 @@ while running:
                     if charged_bullets_check == True:
                         charge_bullet_counter += 1
                         charge_bullet_time_counter += 1
+                        print(charge_bullet_time_counter)
                         if charge_bullet_counter >= 60:
                             create_bullet(player_x,player_y, angle,5,True)
                             charge_bullet_counter = 0
                             pygame.mixer.Sound.play(shoot_sound)
                         if charge_bullet_time_counter >= 600:
                             charged_bullets_check = False
-                            charge_bullet_counter = 0
+                            charge_bullet_time_counter = 0
                         
                 if keys[pygame.K_q]:
                     booster_delay += 1
@@ -647,7 +704,7 @@ while running:
                             elif bullet_type == 3:
                                 bc = 10
                                 b_divide = 1   
-                        booster_delay = 0
+                            booster_delay = 0
                     if power_up_choice == 2:
                         if bullet_mods > 0 and booster_delay >= 10:
                             bullet_mods -= 1
@@ -719,48 +776,55 @@ while running:
                     if spiral_bomb_counter >= 120:
                         spiral_bomb_check = False
                         spiral_bomb_counter = 0
-
+                #blits the player at their location
                 screen.blit(pygame.transform.rotate(space_ship,angle),(player_x,player_y))
                 center = [player_x, player_y + 25]
+                #moves all of the objects on the screen
                 move_bullets()
                 move_asteroids()
                 move_mines()
+                #Sets the spawnrate for the asteroids and spawns the asteroids
                 counter += 1
                 c = difficunity
-                print(difficunity)
                 if counter >= c:
                     add_asteroid(Low,Sec_Low,Sec_High,High,False)
                     counter = 0
+                #Blits all objects on the screen other than the player
                 for b in range(0,len(bullets)):
                     screen.blit(bullets[b][1],(bullets[b][2],bullets[b][3]))
                 for a in range(0,len(asteroids)):
                     screen.blit(asteroids[a][1],(asteroids[a][2],asteroids[a][3]))
                 for cc in range(0,len(mines_list)):
                     screen.blit(mines_list[cc][1],(mines_list[cc][2],mines_list[cc][3]))
-                
+                #creates the player's hitbox
                 hit_box = pygame.Rect(player_x,player_y,25,25)
+                #Resets angle so it never is higher or lower than 180 or -180
                 if angle > 180:
                     angle = -180
                 if angle < -180:
                     angle = 180
-                
+                #checks for collisions with asteroids in bullets
                 for b in range(len(bullets)-1,-1,-1):
                  if bullets[b][6] == False:
                     try:
                         for a in range(len(asteroids)-1,-1,-1):
                             if bullets[b][0].colliderect(asteroids[a][0]['rect']):
                                 bullets.remove(bullets[b])
+                                #checks to see if the asteroid explodes
                                 if asteroids[a][9] == True:
                                     detanate_asteroids(asteroids[a][2],asteroids[a][3],2,20)
                                     asteroids.remove(asteroids[a])
                                     score += 100
+                                    pygame.mixer.Sound.play(asteroid_explode)
                                 else:
+                                    #removes the asteroid from the game
                                     asteroids.remove(asteroids[a])
                                     pygame.mixer.Sound.play(asteroid_explode)
-                                score += 100
+                                    score += 100
                     except:
                         pass
                  elif bullets[b][6] == True:
+                    #same logic but for charged bullets that are not destroyed when they collide
                     try:
                         for a in range(len(asteroids)-1,-1,-1):
                             if bullets[b][0].colliderect(asteroids[a][0]['rect']):
@@ -775,6 +839,7 @@ while running:
                     except:
                         pass
                 for m in range(len(mines_list)-1,-1,-1):
+                 #Moves and blows up mines
                  try:
                     for a in range(len(asteroids)-1,-1,-1):
                         if mines_list[m][0].colliderect(asteroids[a][0]['rect']):
@@ -791,6 +856,7 @@ while running:
                  except:
                     pass   
                 for a in range(len(asteroids)-1,-1,-1):
+                    #Checks for player collision with asteroids
                     if hit_box.colliderect(asteroids[a][0]['rect']) and invicible == False:
                         lifes -= 1
                         asteroids.remove(asteroids[a])
@@ -807,21 +873,22 @@ while running:
 
 
 #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    #Same logic as game above, however 999 lifes and acts as a tutorial
     elif choice == 2:
-        Tutorial_step_1_text = font.render("Press A and D to rotate the Spaceship",True,'black')
-        Tutorial_step_2_text = font.render("Press W and S to Move the the Spaceship Foward and Backward",True,'black')
-        Tutorial_step_3_text = font.render("Press Q to spawn a bomb around your space ship",True,'black')
-        Tutorial_step_4_text = font.render("Press E to greatly increase your fire rate",True,'black')
-        Tutorial_step_5_text = font.render("Press Left Shift to slow any new asteroids",True,'black')
-        Tutorial_step_6_text = font.render("If you get hit you will be invicible for 5 seconds",True,'black')
-        Tutorial_step_7a_text = font.render("Every 30 seconds a random diaster will happen:",True,'black')
-        Tutorial_step_7b_text = font.render("1) The spawn rate of asteroids will increase",True,'black')
-        Tutorial_step_7c_text = font.render("2) Lines of armored asteroids will spawn at the top of the screen",True,'black')
-        Tutorial_step_7d_text = font.render("3) Random destroyed asteroids will explode into smaller asteroids",True,'black')
-        Tutorial_step_8_text = font.render("Every time you survive a disaster you get +1 of every powerup",True,'black')
-        Tutorial_step_9_text = font.render("You've complete the tutorial! Congratulations!",True,'black')
-        timer_1 = font.render(f"Time Before Asteroid Storm: {int(Storm_Timer)}", True, 'black')
-        timer_2 = font.render(f"Time Before the Storm Ends: {int(active_timer)}", True, 'black')
+        Tutorial_step_1_text = font.render("Press A and D to rotate the Spaceship",True,'white')
+        Tutorial_step_2_text = font.render("Press W and S to Move the the Spaceship Foward and Backward",True,'white')
+        Tutorial_step_3_text = font.render("Press Q to spawn a bomb around your space ship",True,'white')
+        Tutorial_step_4_text = font.render("Press E to greatly increase your fire rate",True,'white')
+        Tutorial_step_5_text = font.render("Press Left Shift to slow any new asteroids",True,'white')
+        Tutorial_step_6_text = font.render("If you get hit you will be invicible for 5 seconds",True,'white')
+        Tutorial_step_7a_text = font.render("Every 30 seconds a random diaster will happen:",True,'white')
+        Tutorial_step_7b_text = font.render("1) The spawn rate of asteroids will increase",True,'white')
+        Tutorial_step_7c_text = font.render("2) Lines of armored asteroids will spawn at the top of the screen",True,'white')
+        Tutorial_step_7d_text = font.render("3) Random destroyed asteroids will explode into smaller asteroids",True,'white')
+        Tutorial_step_8_text = font.render("Every time you survive a disaster you get +1 of every powerup",True,'white')
+        Tutorial_step_9_text = font.render("You've complete the tutorial! Congratulations!",True,'white')
+        timer_1 = font.render(f"Time Before Asteroid Storm: {int(Storm_Timer)}", True, 'white')
+        timer_2 = font.render(f"Time Before the Storm Ends: {int(active_timer)}", True, 'white')
         if Storm_Timer > 0:
             Storm_Timer -= clock.get_time() / 1000
             screen.blit(timer_1, (WIDTH//2 - 150, 50))
@@ -840,9 +907,16 @@ while running:
                 difficunity -= 2
                 c = difficunity
                 Storm_Timer = 30
-                fire_rate_booster_count += 1
+                mines += 1
+                lifes += 1
                 bombs += 1
+                fire_rate_booster_count += 1
                 asteroid_slow += 1
+                speed_boosts += 1
+                bullet_mods += 1
+                decrease_difficulties += 1
+                spiral_bombs += 1
+                charged_bullets += 1
         if active_timer > 0 and event_storm == 0:
             active_timer -= clock.get_time() / 1000
             screen.blit(timer_2,(WIDTH//2 - 150, 50))
@@ -854,9 +928,16 @@ while running:
                 difficunity -= 2
                 c = difficunity
                 Storm_Timer = 30
-                fire_rate_booster_count += 1
+                mines += 1
+                lifes += 1
                 bombs += 1
+                fire_rate_booster_count += 1
                 asteroid_slow += 1
+                speed_boosts += 1
+                bullet_mods += 1
+                decrease_difficulties += 1
+                spiral_bombs += 1
+                charged_bullets += 1
         if active_timer > 0 and event_storm == 2:
             active_timer -= clock.get_time() / 1000
             screen.blit(timer_2,(WIDTH//2 - 150, 50))
@@ -868,13 +949,20 @@ while running:
                 difficunity -= 2
                 c = difficunity
                 Storm_Timer = 30
-                fire_rate_booster_count += 1
+                mines += 1
+                lifes += 1
                 bombs += 1
+                fire_rate_booster_count += 1
                 asteroid_slow += 1
-        fire_rate_boosters_left = font.render(f"Fire Rate Boosters Left: {int(fire_rate_booster_count)}",True,'black')
-        bombs_left = font.render(f"Bombs Left: {int(bombs)}",True,'black')
-        slows_left = font.render(f"Asteroids Slowers Left: {int(asteroid_slow)}",True,'black')
-        lifes_lefts = font.render(f"Lifes Left: {int(lifes)}",True,'black')
+                speed_boosts += 1
+                bullet_mods += 1
+                decrease_difficulties += 1
+                spiral_bombs += 1
+                charged_bullets += 1
+        fire_rate_boosters_left = font.render(f"Fire Rate Boosters Left: {int(fire_rate_booster_count)}",True,'white')
+        bombs_left = font.render(f"Bombs Left: {int(bombs)}",True,'white')
+        slows_left = font.render(f"Asteroids Slowers Left: {int(asteroid_slow)}",True,'white')
+        lifes_lefts = font.render(f"Lifes Left: {int(lifes)}",True,'white')
         screen.blit(slows_left,(WIDTH-300,HEIGHT-50))
         screen.blit(lifes_lefts,(10,HEIGHT-50))
         screen.blit(bombs_left,(WIDTH-180,10))
@@ -996,6 +1084,7 @@ while running:
                 invicible = True
                 invicible_timer = 3000
                 if lifes == 0:
+                    pygame.mixer.Sound.play(death_sound)
                     pygame.quit()
                     sys.exit()
             else:
@@ -1069,6 +1158,9 @@ while running:
                 tutorial_counter = 0
                 Tutorial_step_9 = False
     if choice == 3:
+        if death_sound_check == True:
+            pygame.mixer.Sound.play(death_sound)
+            death_sound_check = False
         screen.blit(score_text,(WIDTH//2 - 150,HEIGHT//2 - 50))
         end_timer += 1
         if end_timer >= 600:
@@ -1076,6 +1168,7 @@ while running:
             sys.exit()
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                pygame.mixer.Sound.play(death_sound)
                 pygame.quit()
                 sys.exit()
     pygame.display.update()
