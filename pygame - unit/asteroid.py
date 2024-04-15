@@ -137,15 +137,17 @@ def detanate_mine(x,y,boo):
             bullets.append(bullet_info)
     #used for exploding bullets
     elif boo == True:
-        for b  in range(6):
-            ang += 1
-            x_speed = 2 *math.cos(ang)
-            y_speed = 2 * -1 * (math.sin(ang))
-            bullet_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Good Bullet.png')
+        ang = 90
+        for b in range(6):
+            x_speed = 0.75 *math.cos(ang)
+            y_speed = 0.75 * -1 * (math.sin(ang))
+            bullet_image = pygame.image.load('C:\\Users\GTucker\\ICD20.py\\pygame - unit\\Good Bullet.png')
             bullet_image = pygame.transform.scale(bullet_image,(10,10))
             circle = pygame.Rect(x,y,10,10)
-            bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False,0]
+            bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False]
             bullets.append(bullet_info)
+          
+            ang += 45
 def detanate_asteroids(x_new,y_new,speed,size):
     # Makes the asteroids explode when they are destroyed by bullets
     random_choice = random.randint(0,1)
@@ -158,7 +160,7 @@ def detanate_asteroids(x_new,y_new,speed,size):
     for x in range(4):
         astroid_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Asteroid 1.png')
         astroid_image = pygame.transform.scale(astroid_image,(size,size))
-        circle = {'rect': pygame.Rect(x_new, y_new, 2*size, 2*size), 'color': 'black', 'radius': size}
+        circle = {'rect': pygame.Rect(x_new, y_new, size, size), 'color': 'black', 'radius': size}
         asteroid_info = [circle,astroid_image,x_new,y_new,x_speed,y_speed]
         if y_speed > 0:
             end_height = 800
@@ -264,7 +266,7 @@ def add_meteor(speed,size,x,y):
     y_speed_meteor = speed
     x_speed_meteor =  0
     end_height = 810
-    circle = {'rect': pygame.Rect(x, y, 2*size, 2*size), 'color': 'black', 'radius': size}
+    circle = {'rect': pygame.Rect(x, y, size, size), 'color': 'black', 'radius': size}
     asteroid_info = [circle,astroid_image,x,y,x_speed_meteor,y_speed_meteor,end_height,"h",size]
     asteroids.append(asteroid_info)
 def add_asteroid(lowest,second_lowested,second_highest,highest,boo):
@@ -296,7 +298,7 @@ def add_asteroid(lowest,second_lowested,second_highest,highest,boo):
             end_width = -10
     astroid_image = pygame.image.load('C:\\Users\\GTucker\\ICD20.py\\pygame - unit\\Asteroid 1.png')
     astroid_image = pygame.transform.scale(astroid_image,(size,size))
-    circle = {'rect': pygame.Rect(x, y, 2*size, 2*size), 'color': 'black', 'radius': size}
+    circle = {'rect': pygame.Rect(x, y, size, size), 'color': 'black', 'radius': size}
     asteroid_info = [circle,astroid_image,x,y,x_speed_asteroid,y_speed_asteroid]
     if end_width != None:
         asteroid_info.append(end_width)
