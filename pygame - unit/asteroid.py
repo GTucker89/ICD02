@@ -6,6 +6,7 @@ import time
 
 pygame.init()
 #Create all variables
+Tutorial_step_10 = False
 death_sound_check = True
 HEIGHT = 800
 WIDTH = 800
@@ -124,7 +125,7 @@ def create_bullet(x,y,ang,speed,boo):
 def detanate_mine(x,y,boo):
     ang = 0
     ang += 90
-    #Used for normal mines
+    #Used for normal mines that explode like a bomb
     if boo == False:
         for b  in range(30):
             ang += 1
@@ -135,7 +136,7 @@ def detanate_mine(x,y,boo):
             circle = pygame.Rect(x,y,10,10)
             bullet_info = [circle,bullet_image,x,y,x_speed,y_speed,False,0]
             bullets.append(bullet_info)
-    #used for exploding bullets
+    #used for exploding bullets that create a hexagon of spread
     elif boo == True:
         ang = 90
         for b in range(6):
@@ -888,6 +889,7 @@ while running:
         Tutorial_step_7c_text = font.render("2) Lines of armored asteroids will spawn at the top of the screen",True,'white')
         Tutorial_step_7d_text = font.render("3) Random destroyed asteroids will explode into smaller asteroids",True,'white')
         Tutorial_step_8_text = font.render("Every time you survive a disaster you get +1 of every powerup",True,'white')
+        Tutorial_step_10_text = font.render("Press and hold space to shoot",True,'white')
         Tutorial_step_9_text = font.render("You've complete the tutorial! Congratulations!",True,'white')
         timer_1 = font.render(f"Time Before Asteroid Storm: {int(Storm_Timer)}", True, 'white')
         timer_2 = font.render(f"Time Before the Storm Ends: {int(active_timer)}", True, 'white')
@@ -1152,6 +1154,13 @@ while running:
             if tutorial_counter >= 300:
                 tutorial_counter = 0
                 Tutorial_step_8 = False
+                Tutorial_step_10 = True
+        if Tutorial_step_10 == True:
+            screen.blit(Tutorial_step_10_text,(WIDTH-750,HEIGHT-600))
+            tutorial_counter += 1
+            if tutorial_counter >= 300:
+                tutorial_counter = 0
+                Tutorial_step_10 = False
                 Tutorial_step_9 = True
         if Tutorial_step_9 == True:
             screen.blit(Tutorial_step_9_text,(WIDTH-750,HEIGHT-600))
